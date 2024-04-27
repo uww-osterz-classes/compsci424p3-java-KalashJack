@@ -262,10 +262,12 @@ public class Program3 {
                 }
             } else if(instruction.equals("release")) {
                 tempAvailable[resource] += unit;
+                tempAllocation[process][resource] -= unit;
 
                 System.out.println("Process " + process + " " + instruction + "s " + unit + " unit(s) of resource " + resource + ".");
 
                 available = tempAvailable;
+                allocation = tempAllocation;
             } else {
                 System.out.println("ERROR: Instruction '" + instruction + "' of request #" + i + " is invalid.");
                 return;
@@ -364,7 +366,7 @@ class Proc extends Thread { // I tried to put this class in a separate file, but
                 instruction = "request";
                 val++; // Make the next instruction a release
                 resource = getRand(0, r - 1); // Pick a resource
-                unit = getRand(1, Program3.available[resource]); // Pick a quantity of that resource to request
+                unit = getRand(1, Program3.max[processID][resource]); // Pick a quantity of that resource to request
                 //System.out.println("Unit: " + unit);
 
                 tempAvailable[resource] -= unit;
@@ -408,6 +410,8 @@ class Proc extends Thread { // I tried to put this class in a separate file, but
                 Program3.lock.release(); // Release the mutex
             }
         }
+
+        interrupt(); // Once all six actions have been completed, kill this thread
     }
 
     private int getRand(int min, int max) {
